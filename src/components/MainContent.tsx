@@ -1,8 +1,10 @@
-import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock, Loader2 } from "lucide-react";
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from "motion/react";
+import { productService } from "../services/productService";
 
-const steps = [
+const initialSteps = [
   { label: "Product Setup",           status: "done" },
   { label: "Ghana Compliance",         status: "active" },
   { label: "Destination Compliance",   status: "pending" },
@@ -19,6 +21,41 @@ const statusCards = [
 
 export default function MainContent() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id");
+
+  const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  
+  const [readinessScore, setReadinessScore] = useState(0);
+  const [steps] = useState(initialSteps);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchReadiness = async () => {
+      if (!productId) return;
+      setIsLoading(true);
+      try {
+        const res = await productService.getReadiness(Number(productId));
+        if (res) {
+          setReadinessScore(res.score || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard readiness", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReadiness();
+  }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <Loader2 size={30} className="animate-spin text-teal-600" />
+      </div>
+    );
+  }
 
   return (
     <main className="flex-1 overflow-y-auto bg-gray-50 p-6 space-y-5">
@@ -33,12 +70,12 @@ export default function MainContent() {
         >
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-semibold text-gray-800">Export Readiness</p>
-            <span className="text-xs font-bold text-teal-600">20%</span>
+            <span className="text-xs font-bold text-teal-600">{readinessScore}%</span>
           </div>
           <div className="w-full h-1.5 bg-gray-100 rounded-full mb-5">
             <motion.div
               className="h-1.5 bg-teal-500 rounded-full"
-              initial={{ width: 0 }} animate={{ width: "20%" }}
+              initial={{ width: 0 }} animate={{ width: `${readinessScore}%` }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             />
           </div>
@@ -74,7 +111,7 @@ export default function MainContent() {
           </div>
           <div className="flex items-center gap-4 mt-6">
             <button
-              onClick={() => navigate("/compliance")}
+              onClick={() => navigate(`/compliance${search}`)}
               className="flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
             >
               Start Task <ArrowRight size={15} />
@@ -91,7 +128,7 @@ export default function MainContent() {
         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}
       >
         <button
-          onClick={() => navigate("/product")}
+          onClick={() => navigate(`/product${search}`)}
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm"
         >
           <Zap size={15} />
@@ -107,7 +144,7 @@ export default function MainContent() {
             className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:shadow-sm transition-shadow"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.15 + i * 0.05 }}
-            onClick={() => navigate(href)}
+            onClick={() => navigate(`${href}${search}`)}
           >
             <div className="flex items-center justify-between mb-4">
               <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center">

@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FileText, Download, Eye, CheckCircle2, Loader2, FileSignature, Building2, MapPin, Package, Hash } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { documentService } from "../services/documentService";
+import Stepper from "../components/Stepper";
 
 type DocStatus = "idle" | "generating" | "ready";
 
@@ -59,9 +62,12 @@ function DocCard({ doc, onGenerate }: { doc: Doc; onGenerate: (id: string) => vo
 }
 
 export default function DocumentsPage() {
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id") || "1";
   const [docs, setDocs] = useState(initDocs);
   const [contractStatus, setContractStatus] = useState<DocStatus>("idle");
-  const [contractPreview, setContractPreview] = useState(false);
+  const [generatedContractText, setGeneratedContractText] = useState("");
+  const [contractPdfUrl, setContractPdfUrl] = useState("");
 
   // Contract form state
   const [buyerName, setBuyerName]       = useState("");
@@ -74,25 +80,71 @@ export default function DocumentsPage() {
   const [currency, setCurrency]         = useState("USD");
   const [deliveryTerms, setDeliveryTerms] = useState("");
 
-  const generate = (id: string) => {
+  const generate = async (id: string) => {
     setDocs(d => d.map(doc => doc.id === id ? { ...doc, status: "generating" } : doc));
-    setTimeout(() => {
+    try {
+      await documentService.generateOperationalDocs({
+        product_id: Number(productId),
+        consignee_name: buyerName || "Consignee Name",
+        consignee_address: buyerAddress || "Consignee Address",
+        product_details: {
+          quantity: Number(quantity) || 0,
+          unit_price: Number(totalValue) / (Number(quantity) || 1),
+          net_weight: Number(quantity) || 0,
+          gross_weight: (Number(quantity) || 0) * 1.1,
+        },
+        currency: currency,
+        incoterms: deliveryTerms,
+      });
       setDocs(d => d.map(doc => doc.id === id ? { ...doc, status: "ready" } : doc));
-    }, 1800);
+    } catch (error) {
+      console.error("Failed to generate document", error);
+      setDocs(d => d.map(doc => doc.id === id ? { ...doc, status: "idle" } : doc));
+    }
   };
 
-  const generateContract = () => {
+  const generateContract = async () => {
     setContractStatus("generating");
-    setTimeout(() => { setContractStatus("ready"); setContractPreview(true); }, 2000);
+    try {
+      const response = await documentService.generateContract({
+        product_id: Number(productId),
+        consignee_name: buyerName,
+        consignee_address: buyerAddress,
+        quantity: `${quantity} kg`,
+        quantity_value: Number(quantity),
+        price_per_unit: Number(totalValue) / (Number(quantity) || 1),
+        total_price: Number(totalValue),
+        incoterms: deliveryTerms,
+        port_name: "Tema Port",
+        payment_terms: "30% deposit, 70% against documents",
+        governing_law: "Ghana",
+        dispute_resolution: "Arbitration in Accra",
+      });
+      setGeneratedContractText(response.ai_legal_review || "");
+      
+      let relativeUrl = response.contract_url || "";
+      let absolutePdfUrl = relativeUrl;
+      // Ensure we have an absolute URL for Google Docs Viewer
+      if (relativeUrl.startsWith('/')) {
+        absolutePdfUrl = "https://expo-gen-rose.vercel.app" + relativeUrl;
+      }
+      setContractPdfUrl(absolutePdfUrl);
+      setContractStatus("ready");
+    } catch (error) {
+      console.error("Failed to generate contract", error);
+      setContractStatus("idle");
+    }
   };
 
   const allDocsReady = docs.every(d => d.status === "ready");
 
   return (
-    <main className="flex-1 overflow-y-auto bg-gray-50 p-8 space-y-6">
-
-      <div>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Documents</p>
+    <main className="flex-1 overflow-y-auto bg-gray-50 pb-12">
+      <Stepper currentStep={4} />
+      
+      <div className="px-8 space-y-6">
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Documents</p>
         <h1 className="text-2xl font-bold text-gray-900">Export Documents</h1>
         <p className="text-sm text-gray-500 mt-1">Generate and download all required export documents.</p>
       </div>
@@ -218,7 +270,7 @@ export default function DocumentsPage() {
               </div>
             </div>
 
-            <button onClick={generateContract} disabled={contractStatus === "generating" || !buyerName || !sellerName}
+            <button onClick={generateContract} disabled={contractStatus === "generating" || !buyerName || !sellerName || !buyerAddress || !quantity || !totalValue || !deliveryTerms}
               className="mt-5 w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm py-2.5 rounded-lg transition-colors">
               {contractStatus === "generating"
                 ? <><Loader2 size={14} className="animate-spin" /> Generating Contract…</>
@@ -257,28 +309,55 @@ export default function DocumentsPage() {
                 <motion.div key="preview" className="flex-1 flex flex-col"
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                   <div className="flex-1 bg-gray-50 rounded-xl border border-gray-200 p-5 font-mono text-[10px] text-gray-600 leading-relaxed overflow-auto mb-4">
-                    <p className="font-bold text-gray-800 text-xs mb-3 non-mono font-sans">EXPORT CONTRACT AGREEMENT</p>
-                    <p className="mb-2"><span className="text-gray-400">Date:</span> {new Date().toLocaleDateString()}</p>
-                    <p className="mb-3"><span className="text-gray-400">Ref:</span> EG-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
-                    <p className="mb-1"><span className="text-gray-400">SELLER:</span> {sellerName || "—"}</p>
-                    <p className="mb-3"><span className="text-gray-400">BUYER:</span> {buyerName || "—"} | {buyerAddress || "—"}</p>
-                    <p className="text-gray-400 mb-1">GOODS:</p>
-                    <p className="mb-1">Product: {productDesc || "—"}</p>
-                    <p className="mb-1">HS Code: {hsCode || "—"}</p>
-                    <p className="mb-1">Quantity: {quantity || "—"} kg</p>
-                    <p className="mb-3">Value: {currency} {totalValue || "—"}</p>
-                    <p className="text-gray-400 mb-1">TERMS:</p>
-                    <p className="mb-3">Delivery: {deliveryTerms || "—"}</p>
-                    <p className="text-gray-400 text-[9px] mt-4 leading-relaxed">
-                      This contract is legally binding upon signatures of both parties. Generated by ExportGen.
+                    {contractPdfUrl ? (
+                      <div className="flex flex-col h-full space-y-4">
+                        <iframe 
+                          src={`https://docs.google.com/viewer?url=${encodeURIComponent(contractPdfUrl)}&embedded=true`}
+                          title="Contract Preview" 
+                          className="w-full h-[550px] shadow-sm rounded-lg"
+                        />
+                        {generatedContractText && (
+                          <details className="bg-teal-50 rounded-lg border border-teal-100 group">
+                            <summary className="p-3 text-teal-800 font-semibold font-sans cursor-pointer flex items-center justify-between text-xs list-none">
+                              <span className="flex items-center gap-2">💡 AI Legal Review & Analysis</span>
+                              <span className="text-teal-600 font-normal text-[10px] group-open:hidden underline decoration-teal-200 underline-offset-2">Read summary</span>
+                            </summary>
+                            <div className="px-4 pb-4 pt-1 max-h-48 overflow-y-auto whitespace-pre-wrap font-sans text-[11px] text-teal-700 leading-relaxed border-t border-teal-100/50">
+                              {generatedContractText}
+                            </div>
+                          </details>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <p className="font-bold text-gray-800 text-xs mb-3 non-mono font-sans">EXPORT CONTRACT AGREEMENT</p>
+                        <p className="mb-2"><span className="text-gray-400">Date:</span> {new Date().toLocaleDateString()}</p>
+                        <p className="mb-3"><span className="text-gray-400">Ref:</span> EG-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
+                        <p className="mb-1"><span className="text-gray-400">SELLER:</span> {sellerName || "—"}</p>
+                        <p className="mb-3"><span className="text-gray-400">BUYER:</span> {buyerName || "—"} | {buyerAddress || "—"}</p>
+                        <p className="text-gray-400 mb-1">GOODS:</p>
+                        <p className="mb-1">Product: {productDesc || "—"}</p>
+                        <p className="mb-1">HS Code: {hsCode || "—"}</p>
+                        <p className="mb-1">Quantity: {quantity || "—"} kg</p>
+                        <p className="mb-3">Value: {currency} {totalValue || "—"}</p>
+                        <p className="text-gray-400 mb-1">TERMS:</p>
+                        <p className="mb-3">Delivery: {deliveryTerms || "—"}</p>
+                      </>
+                    )}
+                    <p className="text-gray-400 text-[9px] mt-4 leading-relaxed font-sans">
+                      This contract is legally binding upon signatures of both parties. Drafted by Lexi AI.
                     </p>
                   </div>
 
                   <div className="flex gap-2">
-                    <button className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 py-2.5 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => contractPdfUrl && window.open(contractPdfUrl, "_blank")}
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 py-2.5 rounded-lg transition-colors">
                       <Eye size={13} /> Full Preview
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => contractPdfUrl && window.open(contractPdfUrl, "_blank")}
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg transition-colors">
                       <Download size={13} /> Download PDF
                     </button>
                   </div>
@@ -287,7 +366,8 @@ export default function DocumentsPage() {
             </AnimatePresence>
           </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </main>
   );
 }

@@ -1,17 +1,16 @@
-import { useState, useRef } from "react";
-import { CheckCircle2, Circle, AlertCircle, Upload, ChevronDown, ChevronUp, ShieldCheck, Globe, ArrowRight, Clock } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { CheckCircle2, Circle, AlertCircle, Upload, ChevronDown, ChevronUp, ShieldCheck, Globe, ArrowRight, Clock, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { complianceService } from "../services/complianceService";
+import type { ComplianceRequirement } from "../services/complianceService";
+import { productService } from "../services/productService";
+import Stepper from "../components/Stepper";
 
 type Status = "done" | "pending" | "blocked" | "review";
 
-interface CheckItem {
-  id: string;
-  label: string;
-  description: string;
-  status: Status;
-  requiresUpload?: boolean;
-  uploadedFile?: string | null;
+interface CheckItem extends ComplianceRequirement {
+  country_code?: string;
 }
 
 const statusConfig: Record<Status, { label: string; color: string }> = {
@@ -21,21 +20,6 @@ const statusConfig: Record<Status, { label: string; color: string }> = {
   review:  { label: "In Review", color: "bg-yellow-100 text-yellow-700" },
 };
 
-const ghanaItemsDefault: CheckItem[] = [
-  { id: "g1", label: "Business Registration (RGD)",    description: "Valid certificate from Registrar General's Department.", status: "done",    requiresUpload: true,  uploadedFile: "RGD_Certificate.pdf" },
-  { id: "g2", label: "FDA Ghana Registration",          description: "Product must be registered with the Food and Drugs Authority.", status: "blocked", requiresUpload: true },
-  { id: "g3", label: "Ghana Standards Authority (GSA)", description: "Certification that product meets Ghanaian standards.", status: "review",  requiresUpload: true },
-  { id: "g4", label: "Export License (GEPA)",           description: "Obtain export permit from Ghana Export Promotion Authority.", status: "pending", requiresUpload: false },
-  { id: "g5", label: "Phytosanitary Certificate",       description: "Required for agricultural or food products.", status: "pending", requiresUpload: true },
-];
-
-const destItemsDefault: CheckItem[] = [
-  { id: "d1", label: "FDA USA Registration",         description: "Mandatory for food imports into the United States.", status: "blocked", requiresUpload: false },
-  { id: "d2", label: "Certificate of Origin",        description: "Must be issued and authenticated for duty purposes.", status: "pending", requiresUpload: true },
-  { id: "d3", label: "Import Permit (Destination)",  description: "Obtain importer's permit from the destination country authority.", status: "pending", requiresUpload: false },
-  { id: "d4", label: "Label Compliance",             description: "Product labelling must comply with destination country laws.", status: "pending", requiresUpload: false },
-];
-
 function StatusIcon({ status }: { status: Status }) {
   if (status === "done")    return <CheckCircle2 size={15} className="text-green-500 shrink-0" />;
   if (status === "review")  return <Clock size={15} className="text-yellow-500 shrink-0" />;
@@ -43,9 +27,31 @@ function StatusIcon({ status }: { status: Status }) {
   return <Circle size={15} className="text-gray-300 shrink-0" />;
 }
 
-function ChecklistItem({ item, onUpload }: { item: CheckItem; onUpload: (id: string, name: string) => void }) {
+function ChecklistItem({ item, onUpload, productId }: { item: CheckItem; onUpload: (id: string, name: string) => void, productId: string }) {
   const [expanded, setExpanded] = useState(item.status === "blocked");
+  const [isUploading, setIsUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      setIsUploading(true);
+      try {
+        // Mock file upload to a storage service
+        const fileUrl = `https://storage.example.com/${f.name}`;
+        await productService.uploadDocument(Number(productId) || 1, {
+          document_type: item.label,
+          file_url: fileUrl,
+          verified: false,
+        });
+        onUpload(item.id, f.name);
+      } catch (error) {
+        console.error("Failed to upload document", error);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
 
   return (
     <div className={`border rounded-xl overflow-hidden transition-colors ${
@@ -86,14 +92,17 @@ function ChecklistItem({ item, onUpload }: { item: CheckItem; onUpload: (id: str
                   <button className="text-xs text-gray-400 hover:text-gray-600 underline ml-1" onClick={() => fileRef.current?.click()}>Replace</button>
                 </div>
               ) : (
-                <button onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 border border-dashed border-gray-300 hover:border-teal-400 hover:bg-teal-50 text-xs font-semibold text-gray-400 hover:text-teal-700 px-4 py-2.5 rounded-lg transition-all">
-                  <Upload size={13} /> Upload Document
+                <button 
+                  onClick={() => fileRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex items-center gap-2 border border-dashed border-gray-300 hover:border-teal-400 hover:bg-teal-50 text-xs font-semibold text-gray-400 hover:text-teal-700 px-4 py-2.5 rounded-lg transition-all disabled:opacity-50">
+                  {isUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                  Upload Document
                 </button>
               )
             )}
             <input ref={fileRef} type="file" className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(item.id, f.name); }} />
+              onChange={handleFileChange} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -103,31 +112,109 @@ function ChecklistItem({ item, onUpload }: { item: CheckItem; onUpload: (id: str
 
 export default function CompliancePage() {
   const navigate = useNavigate();
-  const [ghanaList, setGhanaList] = useState(ghanaItemsDefault);
-  const [destList, setDestList]   = useState(destItemsDefault);
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id") || "";
+  const hsCode = searchParams.get("hs_code") || "151590"; // Fallback to a default if missing
+  
+  const [ghanaList, setGhanaList] = useState<CheckItem[]>([]);
+  const [destList, setDestList]   = useState<CheckItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let response;
+        if (productId) {
+          response = await complianceService.getProductCompliance(Number(productId));
+        } else {
+          response = await complianceService.getGhanaCompliance(hsCode);
+        }
+        console.log("Compliance response:", response);
+        
+        let ghanaRaw: any[] = [];
+        let destRaw: any[] = [];
+
+        if (response && typeof response === 'object' && Array.isArray((response as any).ghana_requirements)) {
+          // Extract arrays exactly as returned by product compliance endpoint
+          ghanaRaw = (response as any).ghana_requirements;
+          destRaw = (response as any).destination_requirements || [];
+        } else {
+          // Fallback legacy behavior
+          let rawItems: any[] = [];
+          if (Array.isArray(response)) {
+            rawItems = response;
+          } else if (response && typeof response === 'object' && Array.isArray((response as any).items)) {
+            rawItems = (response as any).items;
+          } else if (response && typeof response === 'object' && Array.isArray((response as any).requirements)) {
+            rawItems = (response as any).requirements;
+          }
+
+          ghanaRaw = rawItems.filter((r: any) => r.country_code === "GHA" || r.country_code === "GH");
+          destRaw = rawItems.filter((r: any) => r.country_code !== "GHA" && r.country_code !== "GH");
+        }
+
+        const mapReq = (item: any): CheckItem => ({
+          id: item.id?.toString() || Math.random().toString(),
+          label: item.requirement_type || item.authority || item.label,
+          description: item.description,
+          status: item.completed ? "done" : item.mandatory ? "pending" : "done",
+          requiresUpload: !!item.expected_document_type || !!item.document_required,
+          country_code: item.country_code?.toUpperCase()
+        });
+
+        const ghana = ghanaRaw.map(mapReq);
+        const dest = destRaw.map(mapReq);
+
+        setGhanaList(ghana);
+        setDestList(dest);
+      } catch (error) {
+        console.error("Failed to fetch compliance requirements", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [productId, hsCode]);
 
   const upload = (
-    list: CheckItem[], setList: React.Dispatch<React.SetStateAction<CheckItem[]>>,
-    id: string, name: string
-  ) => setList(list.map(item => item.id === id
-    ? { ...item, uploadedFile: name, status: item.status === "pending" ? "review" : item.status }
-    : item
-  ));
+    id: string, name: string, listType: 'ghana' | 'dest'
+  ) => {
+    const setList = listType === 'ghana' ? setGhanaList : setDestList;
+    setList(prev => prev.map(item => item.id === id
+      ? { ...item, uploadedFile: name, status: item.status === "pending" ? "review" : item.status }
+      : item
+    ));
+  };
 
-  const ghanaScore = Math.round((ghanaList.filter(i => i.status === "done").length / ghanaList.length) * 100);
-  const destScore  = Math.round((destList.filter(i => i.status === "done").length / destList.length) * 100);
-  const blocked    = [...ghanaList, ...destList].filter(i => i.status === "blocked").length;
+  const ghanaScore = ghanaList.length > 0 ? Math.round((ghanaList.filter(i => i.status === "done").length / ghanaList.length) * 100) : 0;
+  const destScore  = destList.length > 0 ? Math.round((destList.filter(i => i.status === "done").length / destList.length) * 100) : 0;
+  const blocked    = [...ghanaList, ...destList].filter(i => i && i.status === "blocked").length;
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={30} className="animate-spin text-teal-600" />
+          <p className="text-sm font-medium text-gray-500">Loading compliance checklist...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main className="flex-1 overflow-y-auto bg-gray-50 p-8">
-
-      <div className="flex items-start justify-between mb-6">
+    <main className="flex-1 overflow-y-auto bg-gray-50 pb-12">
+      <Stepper currentStep={2} />
+      
+      <div className="px-8">
+        <div className="flex items-start justify-between mb-6">
         <div>
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Compliance</p>
           <h1 className="text-2xl font-bold text-gray-900">Compliance Checklist</h1>
           <p className="text-sm text-gray-500 mt-1">Complete all items to unlock document generation.</p>
         </div>
-        <button onClick={() => navigate("/readiness")}
+        <button onClick={() => navigate(`/readiness?id=${productId}`)}
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
           View Readiness Score <ArrowRight size={15} />
         </button>
@@ -164,8 +251,8 @@ export default function CompliancePage() {
           </div>
           <div className="space-y-2">
             {ghanaList.map(item => (
-              <ChecklistItem key={item.id} item={item}
-                onUpload={(id, name) => upload(ghanaList, setGhanaList, id, name)} />
+              <ChecklistItem key={item.id} item={item} productId={productId}
+                onUpload={(id, name) => upload(id, name, 'ghana')} />
             ))}
           </div>
         </motion.div>
@@ -189,12 +276,13 @@ export default function CompliancePage() {
           </div>
           <div className="space-y-2">
             {destList.map(item => (
-              <ChecklistItem key={item.id} item={item}
-                onUpload={(id, name) => upload(destList, setDestList, id, name)} />
+              <ChecklistItem key={item.id} item={item} productId={productId}
+                onUpload={(id, name) => upload(id, name, 'dest')} />
             ))}
           </div>
         </motion.div>
       </div>
-    </main>
+    </div>
+  </main>
   );
 }

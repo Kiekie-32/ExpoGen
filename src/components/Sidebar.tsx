@@ -1,16 +1,19 @@
 import { LayoutDashboard, Package, ShieldCheck, Sparkles, FolderOpen, Compass, BarChart3 } from "lucide-react";
-import { NavLink } from "react-router-dom";
-
-const navItems = [
-  { label: "Dashboard",          href: "/",           icon: LayoutDashboard },
-  { label: "Product Setup",      href: "/product",    icon: Package },
-  { label: "Compliance",         href: "/compliance", icon: ShieldCheck },
-  { label: "Readiness Score",    href: "/readiness",  icon: BarChart3 },
-  { label: "Documents",          href: "/documents",  icon: FolderOpen },
-  { label: "AI Generator",       href: "/ai",         icon: Sparkles },
-];
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
+  const location = useLocation();
+  const search = location.search; // Includes ?id=...&hs_code=...
+
+  const navItems = [
+    { label: "Dashboard",          href: "/",           icon: LayoutDashboard },
+    { label: "Product Setup",      href: `/product${search}`,    icon: Package },
+    { label: "Compliance",         href: `/compliance${search}`, icon: ShieldCheck },
+    { label: "Readiness Score",    href: `/readiness${search}`,  icon: BarChart3 },
+    { label: "Documents",          href: `/documents${search}`,  icon: FolderOpen },
+    { label: "AI Generator",       href: `/ai${search}`,         icon: Sparkles },
+  ];
+
   return (
     <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col shrink-0">
       {/* Logo */}
