@@ -24,6 +24,23 @@ The API is designed as a guided "Export Wizard". Most responses include a `next_
 `GET /hs-codes/search?q={query}`
 - **Query Params**: `q` (min 2 chars), `limit` (default 10)
 - **Response**: List of HS codes with `next_steps` to create a product.
+  - **Example Response**:
+    ```json
+    [
+      {
+        "hs_code": "151590",
+        "description": "Shea Butter",
+        "next_steps": [
+          {
+            "action": "create_product",
+            "method": "POST",
+            "url": "/products",
+            "params": { "selected_hs_code": "151590" }
+          }
+        ]
+      }
+    ]
+    ```
 
 ### Get HS Code Details
 `GET /hs-codes/{hs_code}`
@@ -88,12 +105,11 @@ The API is designed as a guided "Export Wizard". Most responses include a `next_
 ## 📄 4. Operational Documents
 
 ### Generate Documents
-Generates Commercial Invoice, Packing List, and Certificate of Origin.
-`POST /documents/generate`
+Generates Commercial Invoice, Packing List, and Certificate of Origin for a specific product.
+`POST /products/{product_id}/documents/generate`
 - **Request Body**:
   ```json
   {
-    "product_id": 1,
     "consignee_name": "John Doe Corp",
     "consignee_address": "123 Business Way, New York, USA",
     "exporter_name": "Optional Name",
@@ -108,30 +124,39 @@ Generates Commercial Invoice, Packing List, and Certificate of Origin.
     "incoterms": "FOB"
   }
   ```
-- **Response**: URLs to download the 3 generated PDFs and `next_steps` to generate an AI contract with pre-calculated price totals.
+- **Response**: URLs to download the 3 generated PDFs and `next_steps` to generate an AI contract.
+
+### Download Document
+`GET /documents/download/{filename}`
+- **Response**: The PDF file content.
 
 ---
 
 ## ⚖️ 5. AI Contracts
 
 ### Generate AI Contract
-Uses Lexiform AI to generate a legally grounded contract.
-`POST /contracts/generate`
+Uses Lexiform AI to generate a legally grounded contract for a specific product.
+`POST /products/{product_id}/contracts/generate`
 - **Request Body**:
   ```json
   {
-    "product_id": 1,
     "consignee_name": "John Doe Corp",
     "consignee_address": "123 Business Way, New York, USA",
+    "incoterms": "FOB",
+    "payment_terms": "30% deposit, 70% against documents",
+    "port_name": "Tema Port",
+    "exporter_name": "Optional Name",
+    "exporter_address": "Optional Address",
+    "currency": "USD",
+    "total_price": 2550.0,
+    "price_per_unit": 25.50,
     "quantity": "100 metric tons",
     "quantity_value": 100.0,
-    "price_per_unit": 25.50,
-    "total_price": 2550.0,
-    "incoterms": "FOB",
-    "port_name": "Tema Port",
-    "payment_terms": "30% deposit, 70% against documents",
     "governing_law": "Ghana",
-    "dispute_resolution": "Arbitration in Accra"
+    "dispute_resolution": "Arbitration in Accra",
+    "bank_details": "Optional Bank Details",
+    "representative_title": "Authorized Representative",
+    "special_specifications": "Optional Specifications"
   }
   ```
 - **Response**: PDF download URL, AI legal review text, and any `warnings` (e.g., unresolved placeholders).
@@ -145,6 +170,65 @@ Uses Lexiform AI to generate a legally grounded contract.
   }
   ```
 - **Response**: Detailed AI legal analysis and risk level.
+
+---
+
+## 🛠️ 6. Admin Tools
+
+### Create Compliance Rule
+`POST /admin/compliance`
+- **Header**: `X-Admin-Token` (Optional/Internal depending on setup)
+- **Request Body**:
+  ```json
+  {
+    "hs_code": "151590",
+    "requirement_type": "Permit",
+    "authority": "FDA Ghana",
+    "description": "Export permit required for shea butter",
+    "mandatory": true,
+    "verification_type": "PDF Upload",
+    "source_url": "https://fda.gov.gh",
+    "last_reviewed": "2024-03-20"
+  }
+  ```
+- **Response**: The created compliance rule.
+
+---
+
+## 🏥 7. Health Checks
+
+### API Health
+`GET /health`
+- **Response**: Simple status check.
+
+### Database Health
+`GET /health/db`
+- **Response**: Verifies database connection and migration status.
+
+---
+
+## 👤 8. User Management
+
+### Register User
+`POST /auth/register`
+- **Request Body**:
+  ```json
+  {
+    "full_name": "Barbara Sackey",
+    "email": "barbara@example.com",
+    "business_name": "Sackey Exports Ltd."
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "id": 1,
+    "full_name": "Barbara Sackey",
+    "email": "barbara@example.com",
+    "business_name": "Sackey Exports Ltd.",
+    "created_at": "2024-04-20T12:00:00.000Z"
+  }
+  ```
 
 ---
 

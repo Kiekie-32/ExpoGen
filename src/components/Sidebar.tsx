@@ -1,9 +1,11 @@
-import { LayoutDashboard, Package, ShieldCheck, Sparkles, FolderOpen, Compass, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, ShieldCheck, Sparkles, FolderOpen, Compass, BarChart3, LogOut, User as UserIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Sidebar() {
   const location = useLocation();
   const search = location.search; // Includes ?id=...&hs_code=...
+  const { user, logout } = useAuth();
 
   const navItems = [
     { label: "Dashboard",          href: "/",           icon: LayoutDashboard },
@@ -13,6 +15,15 @@ export default function Sidebar() {
     { label: "Documents",          href: `/documents${search}`,  icon: FolderOpen },
     { label: "AI Generator",       href: `/ai${search}`,         icon: Sparkles },
   ];
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   return (
     <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col shrink-0">
@@ -51,14 +62,34 @@ export default function Sidebar() {
 
       {/* User */}
       <div className="px-4 py-4 border-t border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
-            BS
+        {user ? (
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                {getInitials(user.full_name)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-gray-800 truncate">{user.full_name}</p>
+                <p className="text-[10px] text-gray-500 truncate">{user.business_name || 'Exporter'}</p>
+              </div>
+            </div>
+            <button 
+              onClick={logout}
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-gray-800 truncate">Barbara Sackey</p>
-          </div>
-        </div>
+        ) : (
+          <NavLink
+            to="/login"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 transition-all"
+          >
+            <UserIcon size={15} />
+            Log In
+          </NavLink>
+        )}
       </div>
     </aside>
   );

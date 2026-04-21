@@ -1,5 +1,6 @@
-import { Bell, Settings, Search } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Bell, Settings, Search, User as UserIcon } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const pageTitles: Record<string, string> = {
   '/':           'Dashboard',
@@ -8,11 +9,22 @@ const pageTitles: Record<string, string> = {
   '/readiness':  'Readiness Score',
   '/documents':  'Documents',
   '/ai':         'AI Generator',
+  '/login':      'Account',
 };
 
 export default function Topbar() {
   const { pathname } = useLocation();
   const title = pageTitles[pathname] ?? 'Dashboard';
+  const { user } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   return (
     <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0">
@@ -38,9 +50,15 @@ export default function Topbar() {
           <Settings size={15} className="text-gray-500" />
         </button>
 
-        <div className="w-8 h-8 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer ml-1">
-          BS
-        </div>
+        {user ? (
+          <div className="w-8 h-8 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer ml-1">
+            {getInitials(user.full_name)}
+          </div>
+        ) : (
+          <Link to="/login" className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-gray-200 transition-colors ml-1">
+            <UserIcon size={15} />
+          </Link>
+        )}
       </div>
     </header>
   );

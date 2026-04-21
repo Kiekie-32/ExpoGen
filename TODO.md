@@ -39,6 +39,11 @@
 - [x] **Barbara**: Add stepper (progress bar)
 - [x] **Barbara**: Next action component & minor UI fixes
 
+## Day 8 — User Management (LATEST)
+- [x] **Derrick**: Implement POST /auth/register endpoint (frontend service)
+- [x] **Barbara**: Update registration UI to use the new endpoint
+- [x] **Derrick**: Add Login/Resume Session functionality to restore user profiles
+
 ---
 
 ## CRITICAL MISSING WORK (Next Steps)

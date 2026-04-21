@@ -6,11 +6,13 @@ import { hsCodeService } from "../services/hsCodeService";
 import type { HSSuggestion } from "../services/hsCodeService";
 import { productService } from "../services/productService";
 import Stepper from "../components/Stepper";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProductPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("id");
+  const { user, addProductToUser } = useAuth();
 
   const [productName, setProductName] = useState("");
   const [hsCode, setHsCode] = useState("");
@@ -87,13 +89,18 @@ export default function ProductPage() {
     setIsSaving(true);
     try {
       const product = await productService.create({
-        user_id: 1, // Mock user ID
+        user_id: user?.id || 1, // Use logged-in user ID or fallback to 1
         product_name: productName,
         description: description,
         selected_hs_code: hsCode,
         destination_country: destinationCountry,
       });
       console.log("Product created:", product);
+      
+      // Add to user profile
+      if (product.id) {
+        addProductToUser(product.id);
+      }
       
       // Save to localStorage so we can retrieve it even if GET /products/{id} 404s
       localStorage.setItem(`product_${product.id}`, JSON.stringify(product));

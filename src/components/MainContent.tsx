@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock, Loader2 } from "lucide-react";
+import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock, Loader2, Sparkles } from "lucide-react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from "motion/react";
 import { productService } from "../services/productService";
+import { useAuth } from "../context/AuthContext";
 
 const initialSteps = [
   { label: "Product Setup",           status: "done" },
@@ -21,8 +22,9 @@ const statusCards = [
 
 export default function MainContent() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const productId = searchParams.get("id");
+  const { user } = useAuth();
 
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
   
@@ -31,6 +33,42 @@ export default function MainContent() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let lastProductId: number | null = null;
+    let hsCode = "";
+
+    // 1. Try to get it from AuthContext
+    if (user && user.productIds && user.productIds.length > 0) {
+      lastProductId = user.productIds[user.productIds.length - 1];
+    } else {
+      // 2. Fallback: scan localStorage for any cached product if auth state is out of sync
+      let highestId = -1;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('product_')) {
+          const idStr = key.replace('product_', '');
+          const id = parseInt(idStr, 10);
+          if (!isNaN(id) && id > highestId) {
+            highestId = id;
+          }
+        }
+      }
+      if (highestId !== -1) {
+        lastProductId = highestId;
+      }
+    }
+
+    if (lastProductId !== null && !productId) {
+      const cached = localStorage.getItem(`product_${lastProductId}`);
+      if (cached) {
+        try {
+          const product = JSON.parse(cached);
+          hsCode = product.selected_hs_code || "";
+        } catch (e) {}
+      }
+      setSearchParams({ id: lastProductId.toString(), ...(hsCode ? { hs_code: hsCode } : {}) }, { replace: true });
+      return; // Return early to let the re-render trigger the fetch
+    }
+
     const fetchReadiness = async () => {
       if (!productId) return;
       setIsLoading(true);
@@ -59,6 +97,16 @@ export default function MainContent() {
 
   return (
     <main className="flex-1 overflow-y-auto bg-gray-50 p-6 space-y-5">
+      
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-1 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {user ? `Welcome back, ${user.full_name.split(' ')[0]}!` : "Welcome to ExportGen"}
+        </h2>
+        <p className="text-sm text-gray-500">
+          {user?.business_name ? `Managing exports for ${user.business_name}` : "Streamline your export compliance and documentation."}
+        </p>
+      </div>
 
       {/* TOP ROW */}
       <div className="flex gap-5">
@@ -128,11 +176,11 @@ export default function MainContent() {
         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}
       >
         <button
-          onClick={() => navigate(`/product${search}`)}
+          onClick={() => navigate(`/product`)}
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm"
         >
           <Zap size={15} />
-          Start Export
+          Start New Export
         </button>
       </motion.div>
 

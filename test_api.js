@@ -17,19 +17,11 @@ async function run() {
   };
 
   try {
-    const res1 = await fetch('https://expo-gen-rose.vercel.app/products/40/contracts/generate', {
+    const res1 = await fetch('https://expo-gen-rose.vercel.app/products/40/documents/generate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
-    console.log('/products/40/contracts/generate status:', res1.status);
+    console.log('/products/40/documents/generate status:', res1.status);
     console.log(await res1.text());
-  } catch (e) { console.error(e.message); }
-
-  try {
-    const res2 = await fetch('https://expo-gen-rose.vercel.app/contracts/generate', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-    });
-    console.log('/contracts/generate status:', res2.status);
-    console.log(await res2.text());
   } catch (e) { console.error(e.message); }
 }
 run();
