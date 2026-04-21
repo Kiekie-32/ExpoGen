@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock, Loader2, Sparkles } from "lucide-react";
+import { Flag, Ban, Handshake, FileText, Zap, ArrowRight, CheckCircle2, Circle, Clock, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from "motion/react";
 import { productService } from "../services/productService";
