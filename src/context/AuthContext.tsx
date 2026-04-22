@@ -106,12 +106,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let existingUser = users.find((u) => u.email === userData.email);
     
     if (!existingUser) {
-      // If user doesn't exist, create a new local profile
+      // If user doesn't exist locally, create a fallback profile using the default backend user ID (1)
       existingUser = {
         full_name: userData.full_name || userData.email.split('@')[0],
         business_name: userData.business_name,
         ...userData,
-        id: Math.floor(Math.random() * 10000) + 1,
+        id: 1, // Use 1 to prevent Foreign Key 500 errors on the backend
         productIds: []
       } as User;
       users.push(existingUser);
