@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Compass, Mail, User, Building, ArrowRight, Loader2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  Compass,
+  Mail,
+  User,
+  Building,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
+import { motion } from "motion/react";
 
 export default function LoginPage() {
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [full_name, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [business_name, setBusinessName] = useState('');
+  const [full_name, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [business_name, setBusinessName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { register, login } = useAuth();
   const navigate = useNavigate();
@@ -16,29 +23,32 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       if (isLoginMode) {
         // Use the simulated login which looks up in localStorage
         login({ email });
       } else {
-        await register({ 
-          full_name, 
-          email, 
-          business_name: business_name || undefined 
+        await register({
+          full_name,
+          email,
+          business_name: business_name || undefined,
         });
       }
       setIsLoading(false);
-      navigate('/');
+      navigate("/dashboard");
     } catch (error) {
-      console.error(isLoginMode ? "Login failed:" : "Registration failed:", error);
+      console.error(
+        isLoginMode ? "Login failed:" : "Registration failed:",
+        error,
+      );
       setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100"
@@ -51,8 +61,8 @@ export default function LoginPage() {
             {isLoginMode ? "Welcome Back" : "Create Your Profile"}
           </h1>
           <p className="text-gray-500 text-sm mt-2 text-center">
-            {isLoginMode 
-              ? "Enter your email to continue where you left off." 
+            {isLoginMode
+              ? "Enter your email to continue where you left off."
               : "Join ExpoGen to manage your export products and compliance."}
           </p>
         </div>
@@ -127,7 +137,9 @@ export default function LoginPage() {
               <Loader2 size={20} className="animate-spin" />
             ) : (
               <>
-                {isLoginMode ? "Resume Export Journey" : "Continue to Dashboard"}
+                {isLoginMode
+                  ? "Resume Export Journey"
+                  : "Continue to Dashboard"}
                 <ArrowRight size={20} />
               </>
             )}
@@ -135,18 +147,19 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <button 
+          <button
             onClick={() => setIsLoginMode(!isLoginMode)}
             className="text-xs font-semibold text-teal-600 hover:text-teal-700 transition-colors"
           >
-            {isLoginMode 
-              ? "Don't have a profile yet? Create one" 
+            {isLoginMode
+              ? "Don't have a profile yet? Create one"
               : "Already have a profile? Resume session"}
           </button>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-8">
-          By continuing, you agree to ExpoGen's Terms of Service and Privacy Policy.
+          By continuing, you agree to ExpoGen's Terms of Service and Privacy
+          Policy.
         </p>
       </motion.div>
     </div>

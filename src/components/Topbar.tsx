@@ -1,20 +1,23 @@
-import { Bell, Settings, Search, User as UserIcon } from 'lucide-react';
-import { useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Bell, Settings, Search, User as UserIcon } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const pageTitles: Record<string, string> = {
-  '/':           'Dashboard',
-  '/product':    'Product Setup',
-  '/compliance': 'Compliance',
-  '/readiness':  'Readiness Score',
-  '/documents':  'Documents',
-  '/ai':         'AI Generator',
-  '/login':      'Account',
+  "/": "Landing",
+  "/dashboard": "Dashboard",
+  "/product": "Product Setup",
+  "/compliance": "Compliance",
+  "/readiness": "Readiness Score",
+  "/documents": "Documents",
+  "/ai": "AI Generator",
+  "/login": "Account",
+  "/notifications": "Notifications",
+  "/settings": "Settings",
 };
 
 export default function Topbar() {
   const { pathname } = useLocation();
-  const title = pageTitles[pathname] ?? 'Dashboard';
+  const title = pageTitles[pathname] ?? "Dashboard";
   const { user } = useAuth();
 
   const getInitials = (name: string) => {
@@ -33,7 +36,10 @@ export default function Topbar() {
       <div className="flex items-center gap-2">
         {/* Search */}
         <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <Search
+            size={13}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
           <input
             type="text"
             placeholder="Search..."
@@ -41,21 +47,30 @@ export default function Topbar() {
           />
         </div>
 
-        <button className="relative w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors">
+        <Link
+          to="/notifications"
+          className="relative w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+        >
           <Bell size={15} className="text-gray-500" />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-teal-500 rounded-full" />
-        </button>
+        </Link>
 
-        <button className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors">
+        <Link
+          to="/settings"
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+        >
           <Settings size={15} className="text-gray-500" />
-        </button>
+        </Link>
 
         {user ? (
           <div className="w-8 h-8 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer ml-1">
             {getInitials(user.full_name)}
           </div>
         ) : (
-          <Link to="/login" className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-gray-200 transition-colors ml-1">
+          <Link
+            to="/login"
+            className="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-gray-200 transition-colors ml-1"
+          >
             <UserIcon size={15} />
           </Link>
         )}

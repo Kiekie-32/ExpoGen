@@ -1,4 +1,14 @@
-import { LayoutDashboard, Package, ShieldCheck, Sparkles, FolderOpen, Compass, BarChart3, LogOut, User as UserIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  ShieldCheck,
+  Sparkles,
+  FolderOpen,
+  Compass,
+  BarChart3,
+  LogOut,
+  User as UserIcon,
+} from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -8,12 +18,12 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { label: "Dashboard",          href: "/",           icon: LayoutDashboard },
-    { label: "Product Setup",      href: `/product${search}`,    icon: Package },
-    { label: "Compliance",         href: `/compliance${search}`, icon: ShieldCheck },
-    { label: "Readiness Score",    href: `/readiness${search}`,  icon: BarChart3 },
-    { label: "Documents",          href: `/documents${search}`,  icon: FolderOpen },
-    { label: "AI Generator",       href: `/ai${search}`,         icon: Sparkles },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Product Setup", href: `/product${search}`, icon: Package },
+    { label: "Compliance", href: `/compliance${search}`, icon: ShieldCheck },
+    { label: "Readiness Score", href: `/readiness${search}`, icon: BarChart3 },
+    { label: "Documents", href: `/documents${search}`, icon: FolderOpen },
+    { label: "AI Generator", href: `/ai${search}`, icon: Sparkles },
   ];
 
   const getInitials = (name: string) => {
@@ -32,7 +42,9 @@ export default function Sidebar() {
         <div className="w-7 h-7 rounded-lg bg-teal-500 flex items-center justify-center shadow-sm">
           <Compass size={13} className="text-white" />
         </div>
-        <span className="text-sm font-bold text-gray-900 tracking-tight">ExportGen</span>
+        <span className="text-sm font-bold text-gray-900 tracking-tight">
+          ExportGen
+        </span>
       </div>
 
       {/* Nav */}
@@ -41,7 +53,7 @@ export default function Sidebar() {
           <NavLink
             key={label}
             to={href}
-            end={href === "/"}
+            end={href === "/dashboard"}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                 isActive
@@ -52,7 +64,10 @@ export default function Sidebar() {
           >
             {({ isActive }) => (
               <>
-                <Icon size={15} className={isActive ? "text-teal-600" : "text-gray-400"} />
+                <Icon
+                  size={15}
+                  className={isActive ? "text-teal-600" : "text-gray-400"}
+                />
                 {label}
               </>
             )}
@@ -69,11 +84,15 @@ export default function Sidebar() {
                 {getInitials(user.full_name)}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-gray-800 truncate">{user.full_name}</p>
-                <p className="text-[10px] text-gray-500 truncate">{user.business_name || 'Exporter'}</p>
+                <p className="text-xs font-semibold text-gray-800 truncate">
+                  {user.full_name}
+                </p>
+                <p className="text-[10px] text-gray-500 truncate">
+                  {user.business_name || "Exporter"}
+                </p>
               </div>
             </div>
-            <button 
+            <button
               onClick={logout}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               title="Logout"
