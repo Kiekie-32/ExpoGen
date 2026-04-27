@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Package, FileText, Globe, PackageOpen, Loader2, Info } from "lucide-react";
+import {
+  ArrowLeft,
+  Search,
+  Package,
+  FileText,
+  Globe,
+  PackageOpen,
+  Loader2,
+  Info,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { hsCodeService } from "../services/hsCodeService";
 import type { HSSuggestion } from "../services/hsCodeService";
@@ -105,7 +114,9 @@ export default function ProductPage() {
       // Save to localStorage so we can retrieve it even if GET /products/{id} 404s
       localStorage.setItem(`product_${product.id}`, JSON.stringify(product));
 
-      navigate(`/compliance?id=${product.id}&hs_code=${product.selected_hs_code}`);
+      navigate(
+        `/compliance?id=${product.id}&hs_code=${product.selected_hs_code}`,
+      );
     } catch (error) {
       console.error("Failed to save product", error);
     } finally {
@@ -118,7 +129,9 @@ export default function ProductPage() {
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={30} className="animate-spin text-teal-600" />
-          <p className="text-sm font-medium text-gray-500">Loading product details...</p>
+          <p className="text-sm font-medium text-gray-500">
+            Loading product details...
+          </p>
         </div>
       </div>
     );
@@ -144,14 +157,15 @@ export default function ProductPage() {
             <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">
               Product Status: Draft
             </p>
-            <h1 className="text-xl md:text-2xl font-bold text-teal-600">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-600">
               Add Product Name/ HS code
             </h1>
           </div>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full sm:w-auto justify-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+            className="w-full sm:w-auto justify-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
             {isSaving && <Loader2 size={13} className="animate-spin" />}
             Save
           </button>
@@ -160,7 +174,7 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
           <div className="flex flex-col gap-6 md:gap-8">
             <motion.div
-              className="bg-white rounded-2xl border border-gray-200 p-6 md:p-10 lg:p-12"
+              className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 md:p-10 lg:p-12"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -215,7 +229,7 @@ export default function ProductPage() {
             </motion.div>
 
             <motion.div
-              className="bg-white rounded-2xl border border-gray-200 p-6"
+              className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
@@ -227,8 +241,8 @@ export default function ProductPage() {
                 </h2>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                     Weight (kg)
                   </label>
@@ -243,19 +257,25 @@ export default function ProductPage() {
           </div>
 
           {/*RIGHT COLUMN */}
-          <div className='flex flex-col gap-6'>
-            <motion.div className="bg-white rounded-2xl border border-gray-200 p-6"
+          <div className="flex flex-col gap-6">
+            <motion.div
+              className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.05 }}>
+              transition={{ duration: 0.3, delay: 0.05 }}
+            >
               <div className="flex items-center gap-2 mb-5">
                 <Globe size={16} className="text-teal-600" />
-                <h2 className="text-sm font-bold text-gray-800">Customs & Compliance Data</h2>
+                <h2 className="text-sm font-bold text-gray-800">
+                  Customs & Compliance Data
+                </h2>
               </div>
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">HS Code (Harmonized System)</label>
-                {/* flex row: input grows, button stays fixed width */}
-                <div className="flex gap-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  HS Code (Harmonized System)
+                </label>
+                {/* flex row on larger screens, column on mobile */}
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={hsCode}
@@ -266,8 +286,13 @@ export default function ProductPage() {
                   <button
                     onClick={handleHSLookup}
                     disabled={isSearching}
-                    className="bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center gap-2 shrink-0">
-                    {isSearching ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
+                    className="bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0"
+                  >
+                    {isSearching ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <Search size={13} />
+                    )}
                     AI Lookup
                   </button>
                 </div>
@@ -277,26 +302,36 @@ export default function ProductPage() {
                   {suggestions.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
+                      animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
                       className="mt-3 border border-teal-100 rounded-xl bg-teal-50/30 overflow-hidden"
                     >
                       <div className="p-3 border-b border-teal-100 flex items-center gap-2">
                         <Info size={12} className="text-teal-600" />
-                        <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">AI Suggestions</span>
+                        <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">
+                          AI Suggestions
+                        </span>
                       </div>
                       <div className="max-h-48 overflow-y-auto">
                         {suggestions.map((s, i) => (
                           <button
                             key={i}
-                            onClick={() => selectHSCode(s.code || s.hs_code || "")}
+                            onClick={() =>
+                              selectHSCode(s.code || s.hs_code || "")
+                            }
                             className="w-full text-left p-3 hover:bg-white transition-colors border-b border-teal-50 last:border-0 group"
                           >
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-bold text-teal-700">{s.code || s.hs_code}</span>
-                              <span className="text-[10px] font-bold text-teal-500 bg-teal-100 px-1.5 py-0.5 rounded uppercase">{s.relevance || 0}% Match</span>
+                            <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
+                              <span className="text-xs font-bold text-teal-700 break-all">
+                                {s.code || s.hs_code}
+                              </span>
+                              <span className="text-[10px] font-bold text-teal-500 bg-teal-100 px-1.5 py-0.5 rounded uppercase whitespace-nowrap">
+                                {s.relevance || 0}% Match
+                              </span>
                             </div>
-                            <p className="text-[11px] text-gray-600 leading-snug group-hover:text-gray-900">{s.description}</p>
+                            <p className="text-[11px] text-gray-600 leading-snug group-hover:text-gray-900">
+                              {s.description}
+                            </p>
                           </button>
                         ))}
                       </div>
@@ -308,9 +343,13 @@ export default function ProductPage() {
                   <div className="flex gap-3">
                     <Info size={16} className="text-teal-600 shrink-0" />
                     <div>
-                      <p className="text-xs font-bold text-teal-800 mb-1">Why use AI Lookup?</p>
+                      <p className="text-xs font-bold text-teal-800 mb-1">
+                        Why use AI Lookup?
+                      </p>
                       <p className="text-[11px] text-teal-700/80 leading-relaxed">
-                        Our AI analyzes your product name and description to find the most accurate HS code, ensuring compliant documentation.
+                        Our AI analyzes your product name and description to
+                        find the most accurate HS code, ensuring compliant
+                        documentation.
                       </p>
                     </div>
                   </div>
@@ -318,20 +357,27 @@ export default function ProductPage() {
               </div>
             </motion.div>
 
-            <motion.div className="bg-white rounded-2xl border border-gray-200 p-6"
+            <motion.div
+              className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}>
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
               <div className="flex items-center gap-2 mb-5">
                 <FileText size={16} className="text-teal-600" />
-                <h2 className="text-sm font-bold text-gray-800">Target Market</h2>
+                <h2 className="text-sm font-bold text-gray-800">
+                  Target Market
+                </h2>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Destination Country</label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  Destination Country
+                </label>
                 <select
                   value={destinationCountry}
                   onChange={(e) => setDestinationCountry(e.target.value)}
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300 transition text-gray-600">
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300 transition text-gray-600"
+                >
                   <option value="">Select country...</option>
                   <option value="UK">United Kingdom (GB)</option>
                   <option value="US">United States (US)</option>

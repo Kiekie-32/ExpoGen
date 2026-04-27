@@ -12,7 +12,7 @@ export default function LandingPage() {
         transition={{ duration: 0.8 }}
       >
         <h2 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/40 mb-4">
-          Background
+          AI-backed
         </h2>
         <h1 className="text-5xl md:text-8xl font-light tracking-tight mb-8 leading-[1.1]">
           ExpoGen <br />
