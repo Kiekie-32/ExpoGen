@@ -8,7 +8,7 @@ interface Step {
 }
 
 const steps: Step[] = [
-  { id: 1, label: "Product Setup", href: "/product" },
+  { id: 1, label: "Prod. Setup", href: "/product" },
   { id: 2, label: "Compliance", href: "/compliance" },
   { id: 3, label: "Readiness Score", href: "/readiness" },
   { id: 4, label: "Documents", href: "/documents" },
@@ -66,13 +66,13 @@ export default function Stepper({ currentStep }: StepperProps) {
                 )}
               </div>
               <span
-                className={`absolute top-8 sm:top-10 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
+                className={`absolute top-8 sm:top-10 w-16 sm:w-20 md:w-24 text-center text-[7px] min-[400px]:text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider transition-colors leading-tight ${
                   isActive
                     ? "text-teal-600"
                     : isCompleted
                       ? "text-gray-500"
                       : "text-gray-400"
-                } ${isActive ? "block" : "hidden sm:block"}`}
+                }`}
               >
                 {step.label}
               </span>
