@@ -206,31 +206,31 @@ export default function CompliancePage() {
   return (
     <main className="flex-1 overflow-y-auto bg-gray-50 pb-12">
       <Stepper currentStep={2} />
-      
-      <div className="px-8">
-        <div className="flex items-start justify-between mb-6">
+
+      <div className="px-4 md:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Compliance</p>
-          <h1 className="text-2xl font-bold text-gray-900">Compliance Checklist</h1>
-          <p className="text-sm text-gray-500 mt-1">Complete all items to unlock document generation.</p>
+          <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Compliance</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Compliance Checklist</h1>
+          <p className="text-xs md:text-sm text-gray-500 mt-1">Complete all items to unlock document generation.</p>
         </div>
         <button onClick={() => navigate(`/readiness?id=${productId}`)}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
           View Readiness Score <ArrowRight size={15} />
         </button>
       </div>
 
       {/* Summary bar */}
       {blocked > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3 flex items-center gap-3 mb-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 md:px-5 py-3 flex items-center gap-3 mb-6">
           <AlertCircle size={16} className="text-red-500 shrink-0" />
-          <p className="text-sm text-red-700 font-medium">
-            <span className="font-bold">{blocked} blocked item{blocked > 1 ? "s" : ""}</span> must be resolved before you can generate export documents.
+          <p className="text-xs md:text-sm text-red-700 font-medium leading-relaxed">
+            <span className="font-bold">{blocked} blocked item{blocked > 1 ? "s" : ""}</span> must be resolved before you can proceed.
           </p>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
         {/* GHANA */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>

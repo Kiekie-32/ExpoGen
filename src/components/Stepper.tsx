@@ -21,10 +21,10 @@ interface StepperProps {
 
 export default function Stepper({ currentStep }: StepperProps) {
   return (
-    <div className="w-full py-6 px-8 bg-white border-b border-gray-100 mb-6">
-      <div className="max-w-4xl mx-auto flex items-center justify-between relative">
+    <div className="w-full py-4 md:py-6 px-4 md:px-8 bg-white border-b border-gray-100 mb-4 md:mb-6 overflow-x-auto no-scrollbar">
+      <div className="min-w-[500px] md:min-w-0 max-w-4xl mx-auto flex items-center justify-between relative px-2">
         {/* Background Line */}
-        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
+        <div className="absolute top-4 md:top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
 
         {/* Progress Line */}
         <motion.div
@@ -65,7 +65,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                 )}
               </div>
               <span
-                className={`absolute top-10 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
+                className={`absolute top-10 text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
                   isActive
                     ? "text-teal-600"
                     : isCompleted

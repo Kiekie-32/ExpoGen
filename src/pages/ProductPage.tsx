@@ -128,7 +128,7 @@ export default function ProductPage() {
     <main className="flex-1 overflow-y-auto bg-gray-50 pb-12">
       <Stepper currentStep={1} />
 
-      <div className="px-8">
+      <div className="px-4 md:px-8">
         {/*Back button */}
         <div className="flex items-center gap-3 mb-2">
           <button
@@ -139,28 +139,28 @@ export default function ProductPage() {
           </button>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
+            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">
               Product Status: Draft
             </p>
-            <h1 className="text-2xl font-bold text-teal-600">
+            <h1 className="text-xl md:text-2xl font-bold text-teal-600">
               Add Product Name/ HS code
             </h1>
           </div>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+            className="w-full sm:w-auto justify-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
             {isSaving && <Loader2 size={13} className="animate-spin" />}
             Save
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
-          <div className="flex flex-col gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
+          <div className="flex flex-col gap-6 md:gap-8">
             <motion.div
-              className="bg-white rounded-2xl border border-gray-200 p-12"
+              className="bg-white rounded-2xl border border-gray-200 p-6 md:p-10 lg:p-12"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}

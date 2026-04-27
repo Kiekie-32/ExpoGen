@@ -153,31 +153,31 @@ export default function ReadinessPage() {
   return (
     <main className="flex-1 overflow-y-auto bg-gray-50 pb-12">
       <Stepper currentStep={3} />
-      
-      <div className="px-8">
+
+      <div className="px-4 md:px-8">
         <div className="mb-6">
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Export Readiness</p>
-        <h1 className="text-2xl font-bold text-gray-900">Readiness Score</h1>
-        <p className="text-sm text-gray-500 mt-1">A snapshot of your current export compliance progress.</p>
+        <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Export Readiness</p>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Readiness Score</h1>
+        <p className="text-xs md:text-sm text-gray-500 mt-1">A snapshot of your current export compliance progress.</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-5 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
         {/* Score card */}
-        <motion.div className="col-span-1 bg-white rounded-2xl border border-gray-200 p-6 flex flex-col items-center justify-center"
+        <motion.div className="lg:col-span-1 bg-white rounded-2xl border border-gray-200 p-6 flex flex-col items-center justify-center"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-4">Overall Score</p>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-4">Overall Score</p>
           <ScoreRing value={data.score} />
           <div className="mt-4 text-center">
             <p className="text-sm font-bold text-amber-600">{data.score < 70 ? "Needs Attention" : "Looking Good"}</p>
-            <p className="text-xs text-gray-400 mt-1">Complete blocked items to improve</p>
+            <p className="text-[10px] text-gray-400 mt-1">Complete blocked items to improve</p>
           </div>
         </motion.div>
 
         {/* Category breakdown */}
-        <motion.div className="col-span-2 bg-white rounded-2xl border border-gray-200 p-6"
+        <motion.div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 p-6"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-5">Category Breakdown</p>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-5">Category Breakdown</p>
           {data.category_breakdown.map(({ label, score: s, icon: Icon, color }, i) => (
             <div key={i} className="mb-4 last:mb-0">
               <div className="flex items-center justify-between mb-1.5">
@@ -197,12 +197,12 @@ export default function ReadinessPage() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
 
         {/* Missing items */}
         <motion.div className="bg-white rounded-2xl border border-gray-200 p-6"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-4">Missing Items ({data.missing.length})</p>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-4">Missing Items ({data.missing.length})</p>
           <div className="space-y-2">
             {data.missing.map((item, i) => {
               const { color, label } = severityConfig[item.severity];

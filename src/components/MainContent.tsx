@@ -96,24 +96,24 @@ export default function MainContent() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto bg-gray-50 p-6 space-y-5">
+    <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6 space-y-5">
       
       {/* Welcome Header */}
-      <div className="flex flex-col gap-1 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+      <div className="flex flex-col gap-1 mb-4 md:mb-6">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">
           {user ? `Welcome back, ${user.full_name.split(' ')[0]}!` : "Welcome to ExportGen"}
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-xs md:text-sm text-gray-500">
           {user?.business_name ? `Managing exports for ${user.business_name}` : "Streamline your export compliance and documentation."}
         </p>
       </div>
 
       {/* TOP ROW */}
-      <div className="flex gap-5">
+      <div className="flex flex-col lg:flex-row gap-5">
 
         {/* Progress */}
         <motion.div
-          className="w-72 shrink-0 bg-white rounded-2xl border border-gray-200 p-6"
+          className="w-full lg:w-72 shrink-0 bg-white rounded-2xl border border-gray-200 p-5 md:p-6"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
         >
           <div className="flex items-center justify-between mb-1">
@@ -144,7 +144,7 @@ export default function MainContent() {
 
         {/* Priority Action */}
         <motion.div
-          className="flex-1 bg-[#0f2d4a] rounded-2xl p-8 flex flex-col justify-between"
+          className="flex-1 bg-[#0f2d4a] rounded-2xl p-6 md:p-8 flex flex-col justify-between"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}
         >
           <div>
@@ -152,19 +152,19 @@ export default function MainContent() {
               <Zap size={13} className="text-teal-400" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400">Priority Action</span>
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Next Step: Register with FDA Ghana.</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Next Step: Register with FDA Ghana.</h3>
+            <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
               This is required for your product sector. Mandatory certification must be obtained before any shipping documents can be generated.
             </p>
           </div>
-          <div className="flex items-center gap-4 mt-6">
+          <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4 mt-6">
             <button
               onClick={() => navigate(`/compliance${search}`)}
-              className="flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors"
             >
               Start Task <ArrowRight size={15} />
             </button>
-            <button className="text-white text-sm font-medium border border-white/30 hover:border-white/60 px-5 py-2.5 rounded-lg transition-colors">
+            <button className="w-full sm:w-auto text-white text-sm font-medium border border-white/30 hover:border-white/60 px-6 py-2.5 rounded-lg transition-colors">
               View Guide
             </button>
           </div>
@@ -177,7 +177,7 @@ export default function MainContent() {
       >
         <button
           onClick={() => navigate(`/product`)}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm"
         >
           <Zap size={15} />
           Start New Export
@@ -185,7 +185,7 @@ export default function MainContent() {
       </motion.div>
 
       {/* Status Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statusCards.map(({ icon: Icon, label, description, badge, badgeColor, href }, i) => (
           <motion.div
             key={i}

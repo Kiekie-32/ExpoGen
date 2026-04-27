@@ -47,20 +47,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4 md:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100"
+        className="max-w-md w-full bg-white rounded-2xl md:rounded-3xl shadow-xl shadow-teal-100/50 p-6 md:p-10 border-2 border-teal-600"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg shadow-teal-200 mb-4">
-            <Compass size={24} className="text-white" />
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-teal-500 flex items-center justify-center shadow-lg shadow-teal-200 mb-4">
+            <Compass size={22} className="text-white md:size-24" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
             {isLoginMode ? "Welcome Back" : "Create Your Profile"}
           </h1>
-          <p className="text-gray-500 text-sm mt-2 text-center">
+          <p className="text-gray-500 text-xs md:text-sm mt-2 text-center">
             {isLoginMode
               ? "Enter your email to continue where you left off."
               : "Join ExpoGen to manage your export products and compliance."}
