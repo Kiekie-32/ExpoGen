@@ -161,14 +161,6 @@ export default function ProductPage() {
               Add Product Name/ HS code
             </h1>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="w-full sm:w-auto justify-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
-          >
-            {isSaving && <Loader2 size={13} className="animate-spin" />}
-            Save
-          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
@@ -387,6 +379,18 @@ export default function ProductPage() {
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Bottom Save Button */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="w-full sm:w-auto min-w-[160px] justify-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-8 py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {isSaving && <Loader2 size={13} className="animate-spin" />}
+            Save & Continue
+          </button>
         </div>
       </div>
     </main>

@@ -7,7 +7,7 @@ export default function PublicLayout() {
     <div className="min-h-screen bg-[#1a1a2e] text-white overflow-hidden relative font-sans">
       {/* Shared Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-750 to-teal-900 pointer-events-none" />
-      
+
       {/* Shared Abstract Wavy Lines */}
       <div className="absolute right-0 bottom-0 w-full h-full opacity-50 pointer-events-none overflow-hidden select-none">
         <svg
@@ -33,10 +33,10 @@ export default function PublicLayout() {
                 ],
               }}
               transition={{
-                duration: 10 + i,
+                duration: 4 + i * 0.1,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.2,
+                delay: i * 0.02,
               }}
             />
           ))}

@@ -21,18 +21,19 @@ interface StepperProps {
 
 export default function Stepper({ currentStep }: StepperProps) {
   return (
-    <div className="w-full py-4 md:py-6 px-4 md:px-8 bg-white border-b border-gray-100 mb-4 md:mb-6 overflow-x-auto no-scrollbar">
-      <div className="min-w-[500px] md:min-w-0 max-w-4xl mx-auto flex items-center justify-between relative px-2">
+    <div className="w-full py-3 md:py-6 px-2 sm:px-4 md:px-8 bg-white border-b border-gray-100 mb-4 md:mb-6">
+      <div className="w-full max-w-4xl mx-auto flex items-center justify-between relative px-4">
         {/* Background Line */}
-        <div className="absolute top-4 md:top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
 
         {/* Progress Line */}
         <motion.div
-          className="absolute top-1/2 left-0 h-0.5 bg-teal-500 -translate-y-1/2 z-0"
+          className="absolute top-1/2 left-4 h-0.5 bg-teal-500 -translate-y-1/2 z-0"
           initial={{ width: 0 }}
           animate={{
-            width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
+            width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 2rem)`,
           }}
+          style={{ left: "1rem", right: "1rem" }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         />
 
@@ -43,10 +44,10 @@ export default function Stepper({ currentStep }: StepperProps) {
           return (
             <div
               key={step.id}
-              className="relative z-10 flex flex-col items-center group"
+              className="relative z-10 flex flex-col items-center"
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
                   isCompleted
                     ? "bg-teal-500 border-teal-500"
                     : isActive
@@ -55,23 +56,23 @@ export default function Stepper({ currentStep }: StepperProps) {
                 }`}
               >
                 {isCompleted ? (
-                  <Check size={14} className="text-white" />
+                  <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
                 ) : (
                   <span
-                    className={`text-xs font-bold ${isActive ? "text-teal-600" : "text-gray-400"}`}
+                    className={`text-[10px] sm:text-xs font-bold ${isActive ? "text-teal-600" : "text-gray-400"}`}
                   >
                     {step.id}
                   </span>
                 )}
               </div>
               <span
-                className={`absolute top-10 text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
+                className={`absolute top-8 sm:top-10 text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
                   isActive
                     ? "text-teal-600"
                     : isCompleted
                       ? "text-gray-500"
                       : "text-gray-400"
-                }`}
+                } ${isActive ? "block" : "hidden sm:block"}`}
               >
                 {step.label}
               </span>
