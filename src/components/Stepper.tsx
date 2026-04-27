@@ -21,7 +21,7 @@ interface StepperProps {
 
 export default function Stepper({ currentStep }: StepperProps) {
   return (
-    <div className="w-full py-3 md:py-6 px-2 sm:px-4 md:px-8 bg-white border-b border-gray-100 mb-4 md:mb-6">
+    <div className="w-full py-6 md:py-10 px-2 sm:px-4 md:px-8 bg-white border-b border-gray-100 mb-4 md:mb-6">
       <div className="w-full max-w-4xl mx-auto flex items-center justify-between relative px-4">
         {/* Background Line */}
         <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
