@@ -27,7 +27,7 @@ export default function LandingPage() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/onboarding")}
           className="px-10 py-3 rounded-full border border-white/30 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all"
         >
           Start Export

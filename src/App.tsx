@@ -18,6 +18,7 @@ import AboutUs from "./NavItems/AboutUs";
 import Profile from "./NavItems/Profile";
 import Contact from "./NavItems/Contact";
 import PublicLayout from "./components/PublicLayout";
+import Onboarding from "./components/Onboarding";
 
 export default function App() {
   const { user, isLoading } = useAuth();
@@ -36,6 +37,7 @@ export default function App() {
   const isPublicRoute =
     pathname === "/" ||
     pathname === "/login" ||
+    pathname === "/onboarding" ||
     pathname === "/about" ||
     pathname === "/profile" ||
     pathname === "/contact" ||
@@ -52,6 +54,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
     );

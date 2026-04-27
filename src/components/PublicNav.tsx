@@ -57,7 +57,7 @@ export default function PublicNav() {
 
       <div className="hidden md:block">
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/onboarding")}
           className="px-6 py-2 rounded-full border border-white/30 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all text-white"
         >
           Sign Up
@@ -98,7 +98,7 @@ export default function PublicNav() {
             <button
               onClick={() => {
                 setIsMenuOpen(false);
-                navigate("/login");
+                navigate("/onboarding");
               }}
               className="mt-4 px-10 py-3 rounded-full border border-white/30 text-xs font-bold uppercase tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all"
             >
