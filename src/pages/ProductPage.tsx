@@ -145,7 +145,7 @@ export default function ProductPage() {
         {/*Back button */}
         <div className="flex items-center gap-3 mb-2">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
             <ArrowLeft size={16} /> Back To Dashboard

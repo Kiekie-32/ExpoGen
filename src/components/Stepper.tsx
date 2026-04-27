@@ -10,7 +10,7 @@ interface Step {
 const steps: Step[] = [
   { id: 1, label: "Prod. Setup", href: "/product" },
   { id: 2, label: "Compliance", href: "/compliance" },
-  { id: 3, label: "Readiness Score", href: "/readiness" },
+  { id: 3, label: "Readiness", href: "/readiness" },
   { id: 4, label: "Documents", href: "/documents" },
   { id: 5, label: "AI Generator", href: "/ai" },
 ];
