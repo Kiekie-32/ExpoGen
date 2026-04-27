@@ -11,9 +11,6 @@ export default function LandingPage() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <h2 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/40 mb-4">
-          AI-backed
-        </h2>
         <h1 className="text-5xl md:text-8xl font-light tracking-tight mb-8 leading-[1.1]">
           ExpoGen <br />
           <span className="font-medium text-4xl md:text-6xl text-white/90 block mt-2">
