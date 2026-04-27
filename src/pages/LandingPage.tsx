@@ -5,7 +5,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col justify-center px-8 md:px-16 mt-20 md:mt-32 max-w-4xl">
+    <div className="flex flex-col justify-center px-6 sm:px-8 md:px-16 mt-12 sm:mt-20 md:mt-32 max-w-4xl">
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
