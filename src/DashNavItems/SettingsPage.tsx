@@ -45,7 +45,7 @@ const SECTION_ITEMS: {
 ];
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<Section>("profile");
   const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +55,9 @@ export default function SettingsPage() {
   const [fullName, setFullName] = useState(user?.full_name || "");
   const [businessName, setBusinessName] = useState(user?.business_name || "");
   const [email] = useState(user?.email || "");
+  const [sector, setSector] = useState(user?.sector || "");
+  const [role, setRole] = useState(user?.role || "exporter");
+  const [primaryDestination, setPrimaryDestination] = useState(user?.primary_destination || "");
   const [exportRegion, setExportRegion] = useState("Ghana");
   const [preferredCurrency, setPreferredCurrency] = useState("USD");
 
@@ -66,10 +69,21 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      updateProfile({
+        full_name: fullName,
+        business_name: businessName,
+        sector: sector,
+        role: role,
+        primary_destination: primaryDestination,
+      });
+      setIsSaving(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (error) {
+      console.error("Failed to save profile", error);
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = () => {
@@ -246,7 +260,61 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                      Export Region
+                      Sector
+                    </label>
+                    <select
+                      value={sector}
+                      onChange={(e) => setSector(e.target.value)}
+                      className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition appearance-none"
+                    >
+                      <option value="">Select Sector</option>
+                      <option value="agribusiness">Agribusiness</option>
+                      <option value="cosmetics">Cosmetics</option>
+                      <option value="textiles">Textiles</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      Your Role
+                    </label>
+                    <select
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition appearance-none"
+                    >
+                      <option value="exporter">Exporter</option>
+                      <option value="operations">Operations</option>
+                      <option value="compliance">Compliance</option>
+                      <option value="finance">Finance</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      Primary Destination
+                    </label>
+                    <div className="relative">
+                      <Globe
+                        size={14}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+                      <select
+                        value={primaryDestination}
+                        onChange={(e) => setPrimaryDestination(e.target.value)}
+                        className="w-full text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition appearance-none"
+                      >
+                        <option value="">Choose Destination</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="germany">Germany</option>
+                        <option value="usa">USA</option>
+                        <option value="china">China</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      Export Region (Origin)
                     </label>
                     <div className="relative">
                       <Globe

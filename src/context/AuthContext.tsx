@@ -5,9 +5,12 @@ import type { RegisterRequest } from '../services/authService';
 
 export interface User {
   id: number;
-  full_name: string;
   email: string;
+  full_name?: string;
   business_name?: string;
+  sector?: string;
+  role?: string;
+  primary_destination?: string;
   avatar?: string;
   productIds?: number[];
   created_at?: string;
@@ -17,7 +20,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   register: (userData: RegisterRequest) => Promise<void>;
-  login: (userData: { email: string } & Partial<User>) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
   addProductToUser: (productId: number) => void;
@@ -61,65 +64,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       setUser(userWithProducts);
       localStorage.setItem('expogen_user', JSON.stringify(userWithProducts));
-
-      // Update in all users list too
-      const usersJson = localStorage.getItem('expogen_all_users');
-      let users: any[] = [];
-      try {
-        users = usersJson ? JSON.parse(usersJson) : [];
-        // Migration
-        users = users.map(u => {
-          if (!u.full_name && u.name) u.full_name = u.name;
-          if (!u.business_name && u.company) u.business_name = u.company;
-          return u;
-        });
-      } catch (e) {
-        console.error('Failed to parse users list', e);
-      }
-
-      if (!users.find(u => u.email === userWithProducts.email)) {
-        users.push(userWithProducts);
-        localStorage.setItem('expogen_all_users', JSON.stringify(users));
-      }
     } catch (error) {
       console.error('Registration failed', error);
       throw error;
     }
   }, []);
 
-  const login = useCallback((userData: { email: string } & Partial<User>) => {
-    // Legacy local simulation
-    const usersJson = localStorage.getItem('expogen_all_users');
-    let users: any[] = [];
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      users = usersJson ? JSON.parse(usersJson) : [];
-      // Migration
-      users = users.map(u => {
-        if (!u.full_name && u.name) u.full_name = u.name;
-        if (!u.business_name && u.company) u.business_name = u.company;
-        return u;
-      });
-    } catch (e) {
-      console.error('Failed to parse users list', e);
-    }
-
-    let existingUser = users.find((u) => u.email === userData.email);
-    
-    if (!existingUser) {
-      // If user doesn't exist locally, create a fallback profile using the default backend user ID (1)
-      existingUser = {
-        full_name: userData.full_name || userData.email.split('@')[0],
-        business_name: userData.business_name,
+      const userData = await authService.login({ email, password });
+      const userWithProducts: User = {
         ...userData,
-        id: 1, // Use 1 to prevent Foreign Key 500 errors on the backend
         productIds: []
-      } as User;
-      users.push(existingUser);
-      localStorage.setItem('expogen_all_users', JSON.stringify(users));
+      };
+      setUser(userWithProducts);
+      localStorage.setItem('expogen_user', JSON.stringify(userWithProducts));
+    } catch (error) {
+      console.error('Login failed', error);
+      throw error;
     }
-    
-    setUser(existingUser);
-    localStorage.setItem('expogen_user', JSON.stringify(existingUser));
   }, []);
 
   const logout = useCallback(() => {

@@ -26,11 +26,18 @@ export default function ProductPage() {
   const [productName, setProductName] = useState("");
   const [hsCode, setHsCode] = useState("");
   const [description, setDescription] = useState("");
-  const [destinationCountry, setDestinationCountry] = useState("");
+  const [destinationCountry, setDestinationCountry] = useState(user?.primary_destination || "");
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<HSSuggestion[]>([]);
+
+  useEffect(() => {
+    // If not editing an existing product, and user has a primary destination, set it
+    if (!productId && user?.primary_destination && !destinationCountry) {
+      setDestinationCountry(user.primary_destination);
+    }
+  }, [user, productId, destinationCountry]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -79,7 +86,7 @@ export default function ProductPage() {
     setIsSearching(true);
     setSuggestions([]);
     try {
-      const results = await hsCodeService.search(productName);
+      const results = await hsCodeService.search(productName, user?.sector);
       console.log("HS suggestions received:", results); // Help identify correct property names
       setSuggestions(results);
     } catch (error) {

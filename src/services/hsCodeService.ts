@@ -8,9 +8,9 @@ export interface HSSuggestion {
 }
 
 export const hsCodeService = {
-  search: async (query: string, limit = 10): Promise<HSSuggestion[]> => {
+  search: async (query: string, sector?: string, limit = 10): Promise<HSSuggestion[]> => {
     const response = await api.get('/hs-codes/search', {
-      params: { q: query, limit },
+      params: { q: query, sector, limit },
     });
     return response.data;
   },

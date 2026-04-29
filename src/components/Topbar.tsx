@@ -25,7 +25,8 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   const title = pageTitles[pathname] ?? "Dashboard";
   const { user } = useAuth();
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
     return name
       .split(" ")
       .map((n) => n[0])
